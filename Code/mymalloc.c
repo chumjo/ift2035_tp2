@@ -3,6 +3,11 @@
 
 #include "mymalloc.h"
 
+typedef int bool;
+#define true 1;
+#define false 0;
+
+
 struct bloc
 {
 	void *addr;
@@ -15,12 +20,11 @@ void *mymalloc(size_t size){
     // À modifier
     void *addr;
 
-
     //Si on a besoin d'une nouvelle page mémoire
-    if(size > 4000)
+    if(size > 4096)
     	addr = mmap(size);
     else
-    	addr = mmap(4000);
+    	addr = mmap(4096);
 
     //Ajouter à la liste des adresses avec le size
     //TODO
