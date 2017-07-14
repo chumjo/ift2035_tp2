@@ -1,0 +1,2 @@
+https://stackoverflow.com/questions/1119134/how-do-malloc-and-free-work
+https://github.com/Snaipe/malloc/blob/master/malloc.c
