@@ -2,6 +2,8 @@
 // Tous votre code doit être dans ce fichier
 
 #include "mymalloc.h"
+#include <stdbool.h>
+#include <stddef.h>
 
 typedef int bool;
 #define true 1;
@@ -37,5 +39,6 @@ void *mymalloc(size_t size){
 
 void myfree(void *ptr){
     // À modifier
+
     return;
 }
