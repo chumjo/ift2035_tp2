@@ -1,20 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "mymalloc.h"
+#include "mymallock.h"
 
 
 int main()
 {
-    typedef struct bloc *newBloc;
-    typedef struct bloc bloc;
+    typedef struct block *newBlock;
+    typedef struct block block;
 
-    //newBloc *find;
+    //newBlock *find;
 
-    struct bloc
-        {
+    struct blockk        {
             size_t size;
             int free;
-            struct bloc *next, *pred;
+            struct block *next, *pred;
         };
 
     int tm = 1876870;
@@ -22,29 +21,29 @@ int main()
     int page = 4096;
 
 
-    //struct bloc bloc1 = {*dix, sizeof(1024), false, NULL};
-    newBloc bloc1 = malloc(sizeof(*bloc1));
-    bloc1->size = 1000;
-    bloc1->free = 0;
+    //struct block block1 = {*dix, sizeof(1024), false, NULL};
+    newBlock block1 = mallock(sizeof(*block1));
+    block1->size = 1000;
+    block1->free = 0;
 
-    newBloc bloc2 = malloc(sizeof(*bloc2));
-    newBloc bloc3 = malloc(sizeof(*bloc3));
+    newBlock block2 = mallock(sizeof(*block2));
+    newBlock block3 = mallock(sizeof(*block3));
 
 
-    //struct bloc bloc2 = {*dix, sizeof(1024), false, bloc2};
+    //struct block block2 = {*dix, sizeof(1024), false, block2};
 
-    printf("The size of a bloc is %i\n", sizeof(bloc1));
-    printf("The size of a bloc is %i\n", sizeof(bloc2));
-    printf("The size of a bloc is %i\n", sizeof(bloc3));
-    printf("The size of a bloc is %i\n", sizeof(struct bloc));
+    printf("The size of a block is %i\n", sizeof(block1));
+    printf("The size of a block is %i\n", sizeof(block2));
+    printf("The size of a block is %i\n", sizeof(block3));
+    printf("The size of a block is %i\n", sizeof(struct block));
 
-    printf("page - 2*bloc : %i\n", page-(2*sizeof(bloc2)));
+    printf("page - 2*block : %i\n", page-(2*sizeof(block2)));
 
-    //int *addr = mymalloc(8000);
-    int *addr2 = mymalloc(sizeof(int));
-    int *addr1 = mymalloc(sizeof(int)*2000);
+    //int *addr = mymallock(8000);
+    int *addr2 = mymallock(sizeof(int));
+    int *addr1 = mymallock(4096);
 
-    //char *src = mmap(0, sizeof(bloc2), PROT_READ, MAP_SHARED, -1, 0);
+    //char *src = mmap(0, sizeof(block2), PROT_READ, MAP_SHARED, -1, 0);
 
     //printf("Sorry, can't talk now.");
     //printf("I'm busy!");
