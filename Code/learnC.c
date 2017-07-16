@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "mymalloc.h"
 
 
 int main()
@@ -30,6 +31,9 @@ int main()
     printf("The size of a bloc is %i\n", sizeof(struct bloc));
 
     printf("page - 2*bloc : %i\n", page-(2*sizeof(bloc2)));
+
+    int *addr = mymalloc(sizeof(8000));
+    int *addr2 = mymalloc(sizeof(int));
 
     //char *src = mmap(0, sizeof(bloc2), PROT_READ, MAP_SHARED, -1, 0);
 

@@ -7,11 +7,11 @@
 #include <sys/mman.h>
 
 //Macros
-#define BLOC_SIZE sizeof(struct bloc);
-#define PAGE 4096;
+#define BLOC_SIZE sizeof(struct bloc)
+#define PAGE 4096
 
 
-typedef struc bloc *newBloc;
+typedef struct bloc *newBloc;
 
 
 struct bloc
@@ -22,7 +22,22 @@ struct bloc
     };
 
 
-newBloc memoryList; 
+newBloc memoryList;
+
+newBloc find(size_t size){
+
+    newBloc current = memoryList;
+
+    while(current != NULL){
+
+        if(current->free == 1 && current->size < size+BLOC_SIZE)
+            break;
+        else
+            current = current->next;
+    }
+
+    return current;
+}
 
 
 void *mymalloc(size_t size){
@@ -38,33 +53,19 @@ void *mymalloc(size_t size){
     }
     addr = find(size);
 
-    else if(addr != NULL){
-        printf("Found a space in current memory. Addresse : %s\n", *addr);
-    	
+    if(addr != NULL){
+        printf("Found a space in current memory. Addresse : %s\n", addr);
+
     }
     else{
         printf("Couldn't find a space in current memory. New page : %s\n", PAGE);
         //addr = mmap(PAGE);
     }
-    
+
 
     return addr;
 }
 
-void *find(size_t size){
-
-    newBloc current = memoryList;
-
-    while(current != NULL){
-
-        if(current.free == 1 && current.size < size+BLOC_SIZE)
-            break;
-        else
-            current = current.next;
-    }
-
-    return current;
-}
 
 void myfree(void *ptr){
     // À modifier
