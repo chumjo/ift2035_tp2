@@ -42,6 +42,7 @@ int main()
 
     //int *addr = mymalloc(8000);
     int *addr2 = mymalloc(sizeof(int));
+    int *addr1 = mymalloc(sizeof(int)*2000);
 
     //char *src = mmap(0, sizeof(bloc2), PROT_READ, MAP_SHARED, -1, 0);
 

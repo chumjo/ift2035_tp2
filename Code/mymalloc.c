@@ -32,6 +32,8 @@ Bloc blocList(){
         printf("Creation du premier bloc pour la liste de bloc!\n");
 
         memoryList = malloc(sizeof(*memoryList));
+        //memoryList = mmap(NULL, PAGE, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
         memoryList->size = PAGE-BLOC_SIZE;
         memoryList->free = 1;
         memoryList->next = NULL;
@@ -74,6 +76,14 @@ Bloc find(size_t size){
     return current;
 }
 
+Bloc endList(){
+
+    Bloc current = blocList();
+
+    while(current->next != NULL){
+        current = current->next;
+    }
+}
 
 void *mymalloc(size_t size){
 
@@ -84,9 +94,21 @@ void *mymalloc(size_t size){
 
     //Si on a besoin d'une nouvelle page mémoire
     if(size > (PAGE-2*BLOC_SIZE)){
-        printf("Size bigger than a page. Custom size page : %s\n", size);
-    	//addr = mmap(size);
-        return NULL;
+        printf("Size bigger than a page. Custom size page : %i\n", size);
+
+        Bloc last = endList();
+
+        void *newPage = malloc(size + 2*BLOC_SIZE);
+
+        Bloc newBloc = addr;
+        newBloc->size = size;
+        newBloc->free = 0;
+        newBloc->next = NULL;
+        newBloc->pred = last;
+
+        last->next = newBloc;
+
+        return newBloc+1;
     }
     else
         printf("Taille respectable, on continue!\n");
@@ -94,11 +116,12 @@ void *mymalloc(size_t size){
     addr = find(size);
 
     if(addr != NULL){
-        printf("Found a space in current memory. Addresse : %s\n", addr);
+        printf("Found a space in current memory. Addresse : %i\n", addr);
+        
 
     }
     else{
-        printf("Couldn't find a space in current memory. New page : %s\n", PAGE);
+        printf("Couldn't find a space in current memory. New page : %i\n", PAGE);
         //addr = mmap(PAGE);
     }
 
