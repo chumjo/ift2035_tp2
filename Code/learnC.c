@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <sys/mman.h>
+
 
 int main()
 {
@@ -15,7 +15,7 @@ int main()
 
     int tm = 1876870;
     int* dix = &tm;
-
+    int page = 4096;
 
 
     //struct bloc bloc1 = {*dix, sizeof(1024), false, NULL};
@@ -27,8 +27,11 @@ int main()
     printf("The size of a bloc is %i\n", sizeof(bloc1));
     printf("The size of a bloc is %i\n", sizeof(bloc3));
     printf("The size of a bloc is %i\n", sizeof(bloc2));
+    printf("The size of a bloc is %i\n", sizeof(struct bloc));
 
-    char *src = mmap(0, sizeof(bloc2), PROT_READ, MAP_SHARED, -1, 0);
+    printf("page - 2*bloc : %i\n", page-(2*sizeof(bloc2)));
+
+    //char *src = mmap(0, sizeof(bloc2), PROT_READ, MAP_SHARED, -1, 0);
 
     //printf("Sorry, can't talk now.");
     //printf("I'm busy!");
