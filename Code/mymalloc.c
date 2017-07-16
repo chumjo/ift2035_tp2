@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <sys/mman.h>
+#include <sys/mman.h>
 
 //Macros
 #define BLOC_SIZE (sizeof(struct bloc))
@@ -31,8 +31,8 @@ Bloc blocList(){
 
         printf("Creation du premier bloc pour la liste de bloc!\n");
 
-        memoryList = malloc(sizeof(*memoryList));
-        //memoryList = mmap(NULL, PAGE, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        //memoryList = malloc(sizeof(*memoryList));
+        memoryList = mmap(NULL, PAGE, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
         memoryList->size = PAGE-BLOC_SIZE;
         memoryList->free = 1;
@@ -98,9 +98,10 @@ void *mymalloc(size_t size){
 
         Bloc last = endList();
 
-        void *newPage = malloc(size + 2*BLOC_SIZE);
+        //void *newPage = malloc(size + 2*BLOC_SIZE);
+        void *newPage = mmap(NULL, size+2*BLOC_SIZE, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
-        Bloc newBloc = addr;
+        Bloc newBloc = (Bloc)newPage;
         newBloc->size = size;
         newBloc->free = 0;
         newBloc->next = NULL;
@@ -108,7 +109,9 @@ void *mymalloc(size_t size){
 
         last->next = newBloc;
 
-        return newBloc+1;
+        addr = (void*)(newBloc+1);
+
+        return addr;
     }
     else
         printf("Taille respectable, on continue!\n");
@@ -117,7 +120,7 @@ void *mymalloc(size_t size){
 
     if(addr != NULL){
         printf("Found a space in current memory. Addresse : %i\n", addr);
-        
+
 
     }
     else{
