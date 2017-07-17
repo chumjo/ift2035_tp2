@@ -196,16 +196,16 @@ int main(){
 
   TEST_NOSEGFAULT(test4(), 4);
 
-  //TEST_NOSEGFAULT(test5(), 5);
+  TEST_NOSEGFAULT(test5(), 5);
 
-/*  long res = 0;
+  long res = 0;
   TEST_NOSEGFAULT(res=test6(), 6);
   if (res == 632474318)
     printf("Test 6 %ld OK\n", res);
   else
     printf("Test 6 %ld KO\n", res);
 
-  printf("Done\n");*/
+  printf("Done\n");
   return 0;
 }
 

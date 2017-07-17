@@ -23,12 +23,12 @@ typedef struct block
 
 void printBlock(Block b){
 
-    //printf("\nBlock :%i\n", b);
+    printf("\nBlock :%i\n", b);
 
-    //printf("\n   size :%i\n", b->size);
-    //printf("   free :%i\n", b->free);
-    //printf("   next :%i\n", b->next);
-    //printf("   pred :%i\n\n", b->pred);
+    printf("\n   size :%i\n", b->size);
+    printf("   free :%i\n", b->free);
+    printf("   next :%i\n", b->next);
+    printf("   pred :%i\n\n", b->pred);
 
     return;
 }
@@ -36,19 +36,23 @@ void printBlock(Block b){
 
 int aligne32(size_t size){
 
-    return size - (size % BLOCK_SIZE) + BLOCK_SIZE;
+    int rest = size % BLOCK_SIZE;
+    if(rest != 0)
+        return size - rest + BLOCK_SIZE;
+    else
+        return size;
 }
 
 
 Block blockList(){
 
-    //printf("On reccupere la liste de Block\n");
+    printf("On reccupere la liste de Block\n");
 
     static Block memoryList = NULL;
 
     if(memoryList == NULL){
 
-        //printf("\n***** Creation du premier block pour la liste de block! *****\n\n");
+        printf("\n***** Creation du premier block pour la liste de block! *****\n\n");
 
         memoryList = malloc(PAGE);
         //memoryList = mmap(NULL, PAGE, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -58,10 +62,10 @@ Block blockList(){
         memoryList->next = NULL;
         memoryList->pred = NULL;
 
-        //printf("memoryList -> size :%i\n", memoryList->size);
-        //printf("memoryList -> free :%i\n", memoryList->free);
-        //printf("memoryList -> next :%i\n", memoryList->next);
-        //printf("memoryList -> pred :%i\n\n", memoryList->pred);
+        printf("memoryList -> size :%i\n", memoryList->size);
+        printf("memoryList -> free :%i\n", memoryList->free);
+        printf("memoryList -> next :%i\n", memoryList->next);
+        printf("memoryList -> pred :%i\n\n", memoryList->pred);
     }
 
     return memoryList;
@@ -69,7 +73,7 @@ Block blockList(){
 
 Block findSpace(size_t size){
 
-    //printf("On cherche ou inserer le prochain block...\n");
+    printf("On cherche ou inserer le prochain block...\n");
 
     Block current = blockList();
 
@@ -89,7 +93,7 @@ Block findSpace(size_t size){
 
 void splitBlock(Block b, size_t size){
 
-    //printf("On Split le block!\n");
+    printf("On Split le block!\n");
     printBlock(b);
 
     Block newBlock = ((void*) (b+1)) + size;
@@ -160,10 +164,12 @@ void newPage(Block b, size_t sizePage, size_t sizeBlock){
 
 void *mymalloc(size_t size){
 
+    printf("Size : %i --> ", size);
     size = aligne32(size);
+    printf("%i\n", size);
 
-    //printf("\n|------------|\n|- Mymalloc -|\n|------------|\n");
-    //printf("On cherche un espace de taille : %i\n", size);
+    printf("\n|------------|\n|- Mymalloc -|\n|------------|\n");
+    printf("On cherche un espace de taille : %i\n", size);
 
     // À modifier
     void *addr;
@@ -171,25 +177,25 @@ void *mymalloc(size_t size){
     //Trouver le bloc où on doit insérer
     Block blockInsert = findSpace(size);
 
-    //printf("On insere ici : %i\n", blockInsert);
+    printf("On insere ici : %i\n", blockInsert);
     //printBlock(blockInsert);
 
     //Si on a besoin d'une nouvelle page mémoire
     if(size + BLOCK_SIZE > (blockInsert->size) && blockInsert->next == NULL){
 
-        //printf("Oups! Il manque d'espace, on en demande une nouvelle page : %i\n", size);
+        printf("Oups! Il manque d'espace, on en demande une nouvelle page...\n");
 
         //Si la nouvelle page doit être plus grande que 4ko
         if(size > (PAGE-BLOCK_SIZE)){
 
-            //printf("Nouvelle Page de grande taille. Taille custom : %i\n", size);
+            printf("Nouvelle Page de grande taille. Taille custom : %i\n", size);
 
             newPage(blockInsert, size + BLOCK_SIZE, size);
             //void *newPage = mmap(NULL, size+2*BLOCK_SIZE, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         }
         else {
 
-            //printf("Nouvelle Page : %i\n", PAGE);
+            printf("Nouvelle Page : %i\n", PAGE);
 
             newPage(blockInsert, PAGE, size);
         }
@@ -199,18 +205,18 @@ void *mymalloc(size_t size){
 
         addr = (void*)(newBlock+1);
 
-        //printf("Addresse!! : %i\n", addr);
+        printf("Addresse!! : %i\n", addr);
 
         return addr;        
     }
 
     else {
 
-        //printf("size block : %i\n", blockInsert->size);
-        //printf("size demande : %i\n", size);
+        printf("size block : %i\n", blockInsert->size);
+        printf("size demande : %i\n", size);
 
         if(blockInsert->size != size){
-            //printf("Different!!\n");
+            printf("Different!!\n");
             splitBlock(blockInsert, size);
         }
         else{
@@ -226,31 +232,31 @@ void *mymalloc(size_t size){
 
 void myfree(void *ptr){
     // À modifier
-    //printf("Myfree!\n");
+    printf("Myfree!\n");
 
     if(ptr == NULL){
-        //printf("Pointeur NULL, aucune memoire n'est liberee...\n");
+        printf("Pointeur NULL, aucune memoire n'est liberee...\n");
     }
     else{
 
         Block current = blockList();
 
-        //printf("ptr : %i\n", ptr);
-        //printf("current : %i\n", current+1);
+        printf("ptr : %i\n", ptr);
+        printf("current : %i\n", current+1);
 
         while(current+1 != ptr){
 
             current = current->next;
 
-            //printf("current : %i\n", current+1);
+            printf("current : %i\n", current+1);
 
             if(!current){
-                //printf("Pointeur pas allouer avec mymalloc...\n");
+                printf("Pointeur pas allouer avec mymalloc...\n");
                 return;
             }
         }
 
-        //printf("On libere : %i\n", current);
+        printf("On libere : %i\n", current);
         current->free = 1;
 
         if(current->next == NULL)
