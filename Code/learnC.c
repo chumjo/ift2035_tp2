@@ -10,7 +10,7 @@ int main()
     for(int j = 0; j < 1024 * 1024; j ++){
         a[j]= j;
     }
-    //myfree(a);
+    myfree(a);
 
     return(0);
 }
