@@ -50,7 +50,7 @@ Block blockList(){
 
         //printf("\n***** Creation du premier block pour la liste de block! *****\n\n");
 
-        memoryList = malloc(sizeof(*memoryList));
+        memoryList = malloc(PAGE);
         //memoryList = mmap(NULL, PAGE, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
         memoryList->size = PAGE-BLOCK_SIZE;
@@ -90,11 +90,10 @@ Block findSpace(size_t size){
 void splitBlock(Block b, size_t size){
 
     //printf("On Split le block!\n");
-    //printf("Adresse courante : %i\n", b);
-    //printf("Taille du block : %i\n", size);
+    printBlock(b);
 
     Block newBlock = ((void*) (b+1)) + size;
-    newBlock->size = b->size - size;
+    newBlock->size = b->size - size - BLOCK_SIZE;
     newBlock->free = 1;
     newBlock->next = b->next;
     newBlock->pred = b;
@@ -103,11 +102,13 @@ void splitBlock(Block b, size_t size){
     b->free = 0;
     b->size = size;
 
-    //printf("Adresse du nouveau block : %i\n", newBlock);
+    printBlock(b);
+    printBlock(newBlock);
 
     return;
 }
 
+//Fonction qui merge le block courant et le suivant si c'est possible
 void mergeNextBlock(Block b){
 
     //printf("MergeNextBlock!\n");
@@ -129,13 +130,31 @@ void mergeNextBlock(Block b){
             b->next->pred = b;
 
         printBlock(b);
-
-
-        mergeNextBlock(b);
-
-        return;
     }
     
+    return;
+}
+
+void newPage(Block b, size_t sizePage, size_t sizeBlock){
+
+    void *newPage;
+
+    newPage = malloc(sizePage);
+
+    //On cree un nouveau block au début de la nouvelle page
+    Block newBlock = (Block)newPage;
+
+    newBlock->size = sizeBlock;
+
+    newBlock->free = 0;
+    newBlock->next = NULL;
+    newBlock->pred = b;
+
+    if(sizeBlock + BLOCK_SIZE != sizePage)
+        splitBlock(newBlock, sizeBlock);
+
+    b->next = newBlock;
+
     return;
 }
 
@@ -151,57 +170,33 @@ void *mymalloc(size_t size){
     void *addr;
 
     //Trouver le bloc où on doit insérer
-    Block predBlock = findSpace(size);
+    Block blockInsert = findSpace(size);
 
-    //printf("On insere ici : %i\n", predBlock);
-    //printBlock(predBlock);
+    //printf("On insere ici : %i\n", blockInsert);
+    //printBlock(blockInsert);
 
     //Si on a besoin d'une nouvelle page mémoire
-    if(size + BLOCK_SIZE > (predBlock->size) && predBlock->next == NULL){
+    if(size + BLOCK_SIZE > (blockInsert->size) && blockInsert->next == NULL){
 
         //printf("Oups! Il manque d'espace, on en demande une nouvelle page : %i\n", size);
 
-        void *newPage;
-
         //Si la nouvelle page doit être plus grande que 4ko
-        if(size > (PAGE-2*BLOCK_SIZE)){
+        if(size > (PAGE-BLOCK_SIZE)){
 
             //printf("Nouvelle Page de grande taille. Taille custom : %i\n", size);
 
-            newPage = malloc(size + 2*BLOCK_SIZE);
+            newPage(blockInsert, size + BLOCK_SIZE, size);
             //void *newPage = mmap(NULL, size+2*BLOCK_SIZE, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         }
         else {
 
             //printf("Nouvelle Page : %i\n", PAGE);
 
-            newPage = malloc(PAGE);
+            newPage(blockInsert, PAGE, size);
         }
 
-        //On cree un nouveau block au début de la nouvelle page
-        Block newBlock = (Block)newPage;
-
-        if(size > PAGE)
-            newBlock->size = size;
-        else
-            newBlock->size = PAGE;
-
-        newBlock->free = 0;
-        newBlock->next = NULL;
-        newBlock->pred = predBlock;
-
-        if(newBlock->size != size)
-            splitBlock(newBlock, size);
-
-        printBlock(newBlock);
-
-        //printf("Nouveau block :\n");
-        //printBlock(newBlock);
-
-        predBlock->next = newBlock;
-
-        printBlock(predBlock);
-        //printBlock(predBlock->pred);
+        printBlock(blockInsert);
+        Block newBlock = blockInsert->next;
 
         addr = (void*)(newBlock+1);
 
@@ -212,18 +207,18 @@ void *mymalloc(size_t size){
 
     else {
 
-        //printf("size block : %i\n", predBlock->size);
+        //printf("size block : %i\n", blockInsert->size);
         //printf("size demande : %i\n", size);
 
-        if(predBlock->size != size){
+        if(blockInsert->size != size){
             //printf("Different!!\n");
-            splitBlock(predBlock, size);
+            splitBlock(blockInsert, size);
         }
         else{
-            predBlock->free = 0;
+            blockInsert->free = 0;
         }
 
-        return predBlock+1;
+        return blockInsert+1;
     }
 
     return NULL;
