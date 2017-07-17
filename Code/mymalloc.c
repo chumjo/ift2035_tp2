@@ -23,14 +23,20 @@ typedef struct block
 
 void printBlock(Block b){
 
-    //printf("\nBlock :%i\n", b);
+    printf("\nBlock :%i\n", b);
 
-    //printf("\n   size :%i\n", b->size);
-    //printf("   free :%i\n", b->free);
-    //printf("   next :%i\n", b->next);
-    //printf("   pred :%i\n\n", b->pred);
+    printf("\n   size :%i\n", b->size);
+    printf("   free :%i\n", b->free);
+    printf("   next :%i\n", b->next);
+    printf("   pred :%i\n\n", b->pred);
 
     return;
+}
+
+
+int aligne32(size_t size){
+
+    return size - (size % BLOCK_SIZE) + BLOCK_SIZE;
 }
 
 
@@ -71,7 +77,7 @@ Block findSpace(size_t size){
 
         //printBlock(current);
 
-        if((current->free == 1) && (current->size > (size + BLOCK_SIZE))){
+        if((current->free == 1) && (current->size >= size)){
             break;
         }
         else
@@ -102,8 +108,38 @@ void splitBlock(Block b, size_t size){
     return;
 }
 
+void mergeNextBlock(Block b){
+
+    printf("MergeNextBlock!\n");
+
+    if(b->next == NULL)
+        return;
+
+    Block next = b->next;
+
+    if(next->free == 1 && next == b->size + (void*) (b+1)){
+
+        printf("On merge :\n");
+        printBlock(b);
+        printBlock(next);
+
+        b->size = b->size + (next->size) + BLOCK_SIZE;
+        b->next = next->next;
+        if(b->next != NULL)
+            b->next->pred = b;
+
+        printBlock(b);
+    }
+
+    mergeNextBlock(b);
+
+    return;
+}
+
 
 void *mymalloc(size_t size){
+
+    size = aligne32(size);
 
     //printf("\n|------------|\n|- Mymalloc -|\n|------------|\n");
     //printf("On cherche un espace de taille : %i\n", size);
@@ -118,12 +154,13 @@ void *mymalloc(size_t size){
     //printBlock(predBlock);
 
     //Si on a besoin d'une nouvelle page mémoire
-    if(size + BLOCK_SIZE > (predBlock->size)){
+    if(size + BLOCK_SIZE > (predBlock->size) && predBlock->next == NULL){
 
         //printf("Oups! Il manque d'espace, on en demande une nouvelle page : %i\n", size);
 
         void *newPage;
 
+        //Si la nouvelle page doit être plus grande que 4ko
         if(size > (PAGE-2*BLOCK_SIZE)){
 
             //printf("Nouvelle Page de grande taille. Taille custom : %i\n", size);
@@ -138,16 +175,20 @@ void *mymalloc(size_t size){
             newPage = malloc(PAGE);
         }
 
+        //On cree un nouveau block au début de la nouvelle page
         Block newBlock = (Block)newPage;
 
-        newBlock->size = PAGE;
+        if(size > PAGE)
+            newBlock->size = size;
+        else
+            newBlock->size = PAGE;
+
         newBlock->free = 0;
         newBlock->next = NULL;
         newBlock->pred = predBlock;
 
-        printBlock(newBlock);
-
-        splitBlock(newBlock, size);
+        if(newBlock->size != size)
+            splitBlock(newBlock, size);
 
         printBlock(newBlock);
 
@@ -157,7 +198,7 @@ void *mymalloc(size_t size){
         predBlock->next = newBlock;
 
         printBlock(predBlock);
-        printBlock(predBlock->pred);
+        //printBlock(predBlock->pred);
 
         addr = (void*)(newBlock+1);
 
@@ -181,36 +222,45 @@ void *mymalloc(size_t size){
 
         return predBlock+1;
     }
+
+    return NULL;
 }
 
 
 void myfree(void *ptr){
     // À modifier
+    //printf("Myfree!\n");
+
     if(ptr == NULL){
-        printf("Pointeur NULL, aucune memoire n'est liberee...\n");
+        //printf("Pointeur NULL, aucune memoire n'est liberee...\n");
     }
     else{
 
         Block current = blockList();
 
-        printf("ptr : %i\n", ptr);
-        printf("current : %i\n", current+1);
+        //printf("ptr : %i\n", ptr);
+        //printf("current : %i\n", current+1);
 
         while(current+1 != ptr){
 
             current = current->next;
 
-            printf("current : %i\n", current+1);
+            //printf("current : %i\n", current+1);
 
             if(!current){
-                printf("Pointeur pas allouer avec mymalloc...\n");
+                //printf("Pointeur pas allouer avec mymalloc...\n");
                 return;
             }
         }
 
-        printf("On libere : %i\n", current);
+        //printf("On libere : %i\n", current);
         current->free = 1;
-        printf("Ca a fonctionne!!!\n");
+
+        mergeNextBlock(current);
+
+        if(current->pred != NULL)
+            mergeNextBlock(current->pred);
+
     }
     return;
 }
