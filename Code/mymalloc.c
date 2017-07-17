@@ -111,16 +111,13 @@ void splitBlock(Block b, size_t size){
 //Fonction qui merge le block courant et le suivant si c'est possible
 void mergeNextBlock(Block b){
 
-    //printf("MergeNextBlock!\n");
-
-    if(b->next == NULL)
-        return;
+    printf("MergeNextBlock!\n");
 
     Block next = b->next;
 
     if(next->free == 1 && next == b->size + (void*) (b+1)){
 
-        //printf("On merge :\n");
+        printf("On merge :\n");
         printBlock(b);
         printBlock(next);
 
@@ -140,6 +137,8 @@ void newPage(Block b, size_t sizePage, size_t sizeBlock){
     void *newPage;
 
     newPage = malloc(sizePage);
+
+    printf("New Page taille %i : %i\n", sizePage, newPage);
 
     //On cree un nouveau block au début de la nouvelle page
     Block newBlock = (Block)newPage;
@@ -254,9 +253,10 @@ void myfree(void *ptr){
         //printf("On libere : %i\n", current);
         current->free = 1;
 
-        mergeNextBlock(current);
+        if(current->next == NULL)
+            mergeNextBlock(current);
 
-        if(current->pred != NULL)
+        if(current->pred != NULL && current->pred->free == 1)
             mergeNextBlock(current->pred);
 
 

@@ -66,6 +66,9 @@ struct node {
 
 // Petit programme pour testé si malloc et free fonctionne bien
 int test6(){
+
+  printf("Size of node = %i\n", sizeof(node));
+
   // La racine
   node *root = mymalloc(sizeof(node));
   root->valueInt = 0;
@@ -75,7 +78,8 @@ int test6(){
 
   // Création d'une liste doublement chaînée
   node *current = root;
-  for(int i = 0; i < 4 * 1024 * 1024; i ++){
+  for(int i = 0; i < 4*32; i ++){
+  //for(int i = 0; i < 4 * 1024 * 1024; i ++){
     node *p = mymalloc(sizeof(node));
     p->valueInt = i;
     p->valueChar = 115;
@@ -83,7 +87,12 @@ int test6(){
     p->previous = current;
     current->next = p;
     current = p;
+
+    //printf("Nouvelle Node addresse : %i\n", p);
   }
+
+  printf("Liste DONE!!\n");
+  fflush(stdout);
 
   // On efface quelques éléments
   current = root;
@@ -96,6 +105,8 @@ int test6(){
     }
     else {
       // On efface ce noeud
+      printf("Efface : %i\n", current);
+
       node *tmp;
       current->previous->next = current->next;
       current->next->previous = current->previous;
@@ -105,13 +116,23 @@ int test6(){
     }
   }
 
+  printf("Efface DONE!!\n");
+
+  printf("Size of node = %i\n", sizeof(node));
+  printf("Size of double = %i\n", sizeof(double));
+
   // Quelques appel à malloc voir si cela vous mélange un peu
   void *ptrArray[1024];
-  for(int i = 0; i < 1024; i ++){
+
+  for(int i = 0; i < 10; i ++){
     int *d = mymalloc(sizeof(double));
     *d = 435;
     ptrArray[i] = d;
+
+    printf("Ajoute : %i\n", d);
   }
+
+  printf("Melange DONE!!\n");
 
   // On ajoute quelques éléments
   current = root;
@@ -138,10 +159,14 @@ int test6(){
   // Calcul de la somme
   current = root;
   long sum = root->valueInt + root->valueChar;
+  printf("Sum = %i\n", sum);
+
   while (current->next){
     sum += current->valueInt + current->valueChar;
     current = current->next;
   }
+
+  printf("Sum = %i\n", sum);
 
   // Nettoyage de la mémoire
   current = root;
@@ -158,6 +183,10 @@ int test6(){
 
   return sum;
 }
+
+//||||||||||||||||||||||||||||||||||||
+//||||||||||||||||||||||||||||||||||||
+//||||||||||||||||||||||||||||||||||||
 
 void sigseg_handler(int signum) {
 #if defined(_WIN32) || defined(_WIN64)
@@ -188,7 +217,9 @@ void sigseg_handler(int signum) {
 
 int main(){
   signal(SIGSEGV, &sigseg_handler);
-  TEST_NOSEGFAULT(test1(), 1);
+
+
+/*  TEST_NOSEGFAULT(test1(), 1);
 
   TEST_NOSEGFAULT(test2(), 2);
 
@@ -197,9 +228,13 @@ int main(){
   TEST_NOSEGFAULT(test4(), 4);
 
   TEST_NOSEGFAULT(test5(), 5);
-
+*/
   long res = 0;
   TEST_NOSEGFAULT(res=test6(), 6);
+
+  printf("Objectif :res = 632474318\n"); 
+  printf("Actual :  res = %s\n", res);
+
   if (res == 632474318)
     printf("Test 6 %ld OK\n", res);
   else
