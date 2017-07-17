@@ -9,17 +9,31 @@ int main()
 
 
     //int *addr = mymalloc(8000);
+
+    myfree(NULL);
+
+    int *a = malloc(sizeof(int));
+    myfree(a);
+    free(a);
+
+    int *b = mymalloc(sizeof(int));
+
+    myfree(b);
+
+    int *c = mymalloc(sizeof(int) * 20);
+
+    for(int j = 0; j < 20; j ++){
+      c[j]= j;
+      printf("addr : %i = %i\n", &c[j], c[j]);
+    }
+
+    printf("c : %i\n", c);
+
+    myfree(c);
+
+    printf("On est sortie!!\n");
     
 
-    for (int i = 0; i < 500; i++){
-    	int *a = mymalloc(sizeof(int) * 128);
-	}
-  	
-    //int *addr1 = mymalloc(sizeof(int)*5000);
 
-    //char *src = mmap(0, sizeof(block2), PROT_READ, MAP_SHARED, -1, 0);
-
-    //printf("Sorry, can't talk now.");
-    //printf("I'm busy!");
     return(0);
 }

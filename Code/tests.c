@@ -188,15 +188,28 @@ void sigseg_handler(int signum) {
 
 int main(){
   signal(SIGSEGV, &sigseg_handler);
+
+  printf("TEST 1\n");
+
   TEST_NOSEGFAULT(test1(), 1);
+
+  printf("TEST 2\n");
 
   TEST_NOSEGFAULT(test2(), 2);
 
+  printf("TEST 3\n");
+
   TEST_NOSEGFAULT(test3(), 3);
+
+  printf("TEST 4\n");
 
   TEST_NOSEGFAULT(test4(), 4);
 
+  printf("TEST 5\n");
+
   TEST_NOSEGFAULT(test5(), 5);
+
+  printf("TEST 6\n");
 
   long res = 0;
   TEST_NOSEGFAULT(res=test6(), 6);

@@ -187,23 +187,31 @@ void *mymalloc(size_t size){
 void myfree(void *ptr){
     // À modifier
     if(ptr == NULL){
-        //printf("Pointeur NULL, rien n'est libéré...\n");
+        printf("Pointeur NULL, aucune memoire n'est liberee...\n");
     }
     else{
 
         Block current = blockList();
 
-        while(current != ptr){
+        printf("ptr : %i\n", ptr);
+        printf("current : %i\n", current+1);
+
+        while(current+1 != ptr){
+
             current = current->next;
+
+            printf("current : %i\n", current+1);
+
+            if(!current){
+                printf("Pointeur pas allouer avec mymalloc...\n");
+                return;
+            }
         }
 
-        if(!current);
-            //printf("Pointeur pas allouer avec mymalloc...\n")
-        else
-            current->free = 1;
+        printf("On libere : %i\n", current);
+        current->free = 1;
+        printf("Ca a fonctionne!!!\n");
     }
-
-
     return;
 }
 
