@@ -25,9 +25,10 @@ int main()
     printf("addr3 : %i = %i\n", addr3, *addr3);
     printf("addr1 : %i = %i\n", addr1, *addr1);
 
-/*	for (int i = 0; i < 50000; i++){
 
-		printf("boucle1 : %i\n", i);
+	for (int i = 0; i < 50000; i++){
+
+		//printf("boucle1 : %i\n", i);
 
     	int *a = mymalloc(sizeof(int) * 512);
 	    for(int j = 0; j < 512; j ++){
@@ -35,20 +36,27 @@ int main()
 	    	a[j]= j;
 	    }
     	myfree(a);
-	}*/
+	}
 
-/*	printf("COOL\n");
+
+	printf("COOL\n");
 
 
 	int *b = mymalloc(sizeof(int) * 1024 * 1024);
 
+	printf("COOL\n");
+
+
 	for(int j = 0; j < 1024 * 1024; j ++){
     	b[j]= j;
   	}
+
+  	printf("COOL\n");
+
  	myfree(b);
 
 
- 	printf("COOL 2\n");*/
+ 	printf("COOL 2\n");
 
     return(0);
 }

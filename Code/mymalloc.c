@@ -23,12 +23,12 @@ typedef struct block
 
 void printBlock(Block b){
 
-    printf("\nBlock :%i\n", b);
+    //printf("\nBlock :%i\n", b);
 
-    printf("\n   size :%i\n", b->size);
-    printf("   free :%i\n", b->free);
-    printf("   next :%i\n", b->next);
-    printf("   pred :%i\n\n", b->pred);
+    //printf("\n   size :%i\n", b->size);
+    //printf("   free :%i\n", b->free);
+    //printf("   next :%i\n", b->next);
+    //printf("   pred :%i\n\n", b->pred);
 
     return;
 }
@@ -110,7 +110,7 @@ void splitBlock(Block b, size_t size){
 
 void mergeNextBlock(Block b){
 
-    printf("MergeNextBlock!\n");
+    //printf("MergeNextBlock!\n");
 
     if(b->next == NULL)
         return;
@@ -119,7 +119,7 @@ void mergeNextBlock(Block b){
 
     if(next->free == 1 && next == b->size + (void*) (b+1)){
 
-        printf("On merge :\n");
+        //printf("On merge :\n");
         printBlock(b);
         printBlock(next);
 
@@ -129,10 +129,13 @@ void mergeNextBlock(Block b){
             b->next->pred = b;
 
         printBlock(b);
+
+
+        mergeNextBlock(b);
+
+        return;
     }
-
-    mergeNextBlock(b);
-
+    
     return;
 }
 
@@ -261,6 +264,11 @@ void myfree(void *ptr){
         if(current->pred != NULL)
             mergeNextBlock(current->pred);
 
+
+        /*if(current->size >= PAGE + BLOCK_SIZE){
+            //munmap.....
+        }*/
+        
     }
     return;
 }

@@ -192,7 +192,7 @@ int main(){
 
   TEST_NOSEGFAULT(test2(), 2);
 
-  //TEST_NOSEGFAULT(test3(), 3);
+  TEST_NOSEGFAULT(test3(), 3);
 
   TEST_NOSEGFAULT(test4(), 4);
 
