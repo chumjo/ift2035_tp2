@@ -1,16 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "mymalloc.h"
+//#include "mymalloc.h"
 
 
 int main()
 {
-	int *a = mymalloc(sizeof(int) * 1024 * 1024);
 
-    for(int j = 0; j < 1024 * 1024; j ++){
-        a[j]= j;
-    }
-    myfree(a);
+	if(!NULL)
+		printf("!NULL\n");
+
+	if(1)
+		printf("1\n");
+
+	if(0)
+		printf("0\n");
+/*	int *a = mymalloc(sizeof(int));
+	int *b = mymalloc(sizeof(int));
+	int *c = mymalloc(sizeof(int));
+	int *d = mymalloc(sizeof(int));
+
+	myfree(a);
+	myfree(b);
+
+	typedef struct block
+    {
+        size_t size;
+        struct block *free;
+        struct block *next, *pred;
+    } *Block;
+
+    printf("Size of struct :%i\n", sizeof(struct block));*/
 
     return(0);
 }

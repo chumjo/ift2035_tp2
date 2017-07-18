@@ -73,10 +73,11 @@ int test6(){
   root->next = NULL;
   root->previous = NULL;
 
+  printf("Et de 1...\n");
   // Création d'une liste doublement chaînée
   node *current = root;
-  for(int i = 0; i < 4 * 1024; i ++){
   //for(int i = 0; i < 4 * 1024 * 1024; i ++){
+  for(int i = 0; i < 4 * 1024 * 32; i ++){
     node *p = mymalloc(sizeof(node));
     p->valueInt = i;
     p->valueChar = 115;
@@ -84,12 +85,9 @@ int test6(){
     p->previous = current;
     current->next = p;
     current = p;
-
-    printf("node %i : %i\n", i, p);
   }
 
-  printf("Sortie!\n");
-
+  printf("Et de 2...\n");
   // On efface quelques éléments
   current = root;
   int n = 0;
@@ -110,6 +108,8 @@ int test6(){
     }
   }
 
+  printf("Et de 3...\n");
+
   // Quelques appel à malloc voir si cela vous mélange un peu
   void *ptrArray[1024];
   for(int i = 0; i < 1024; i ++){
@@ -117,6 +117,8 @@ int test6(){
     *d = 435;
     ptrArray[i] = d;
   }
+
+  printf("Et de 4...\n");
 
   // On ajoute quelques éléments
   current = root;
@@ -140,6 +142,8 @@ int test6(){
     }
   }
 
+  printf("Et de 5...\n");
+
   // Calcul de la somme
   current = root;
   long sum = root->valueInt + root->valueChar;
@@ -147,6 +151,8 @@ int test6(){
     sum += current->valueInt + current->valueChar;
     current = current->next;
   }
+
+  printf("Et de 6...\n");
 
   // Nettoyage de la mémoire
   current = root;
@@ -157,9 +163,13 @@ int test6(){
   }
   myfree(current);
 
+  printf("Et de 7...\n");
+
   for(int i = 0; i < 1024; i ++){
     myfree(ptrArray[i]);
   }
+
+  printf("Et de 8...\n");
 
   return sum;
 }
@@ -193,15 +203,15 @@ void sigseg_handler(int signum) {
 
 int main(){
   signal(SIGSEGV, &sigseg_handler);
-  //TEST_NOSEGFAULT(test1(), 1);
+  TEST_NOSEGFAULT(test1(), 1);
 
-  //TEST_NOSEGFAULT(test2(), 2);
+  TEST_NOSEGFAULT(test2(), 2);
 
-  //TEST_NOSEGFAULT(test3(), 3);
+  TEST_NOSEGFAULT(test3(), 3);
 
-  //TEST_NOSEGFAULT(test4(), 4);
+  TEST_NOSEGFAULT(test4(), 4);
 
-  //TEST_NOSEGFAULT(test5(), 5);
+  TEST_NOSEGFAULT(test5(), 5);
 
   long res = 0;
   TEST_NOSEGFAULT(res=test6(), 6);
