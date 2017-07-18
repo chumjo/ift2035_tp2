@@ -19,8 +19,19 @@ void test1(){
 // Utilisation très simple de malloc et free
 void test2(){
   int *a = mymalloc(sizeof(int));
+
+  printList();
+  printFree();
+  printLast();
+  printLastFree();
+
   *a = 0;
   myfree(a);
+
+  printList();
+  printFree();
+  printLast();
+  printLastFree();
 }
 
 // Test simple pour voir si free fonctionne
@@ -91,7 +102,6 @@ int test6(){
   current = root;
   int n = 0;
   while (current->next){
-    printf("%i\n", n);
     n++;
     if (n % 23 != 0) {
       // Rien à faire
@@ -99,6 +109,7 @@ int test6(){
     }
     else {
       // On efface ce noeud
+      printf("%i\n", n);
       node *tmp;
       current->previous->next = current->next;
       current->next->previous = current->previous;
@@ -203,15 +214,15 @@ void sigseg_handler(int signum) {
 
 int main(){
   signal(SIGSEGV, &sigseg_handler);
-  TEST_NOSEGFAULT(test1(), 1);
+  //TEST_NOSEGFAULT(test1(), 1);
 
-  TEST_NOSEGFAULT(test2(), 2);
+  //TEST_NOSEGFAULT(test2(), 2);
 
-  TEST_NOSEGFAULT(test3(), 3);
+  //TEST_NOSEGFAULT(test3(), 3);
 
-  TEST_NOSEGFAULT(test4(), 4);
+  //TEST_NOSEGFAULT(test4(), 4);
 
-  TEST_NOSEGFAULT(test5(), 5);
+  //TEST_NOSEGFAULT(test5(), 5);
 
   long res = 0;
   TEST_NOSEGFAULT(res=test6(), 6);

@@ -14,7 +14,7 @@
 
 typedef struct head
 {
-    struct block *first, *last, *firstFree;
+    struct block *first, *last, *firstFree, *lastFree;
 } *Head;
 
 
@@ -46,6 +46,7 @@ Head getHead(){
         head->first = firstBlock;
         head->last = firstBlock;
         head->firstFree = firstBlock;
+        head->lastFree = firstBlock;
     }
 
     return head;
@@ -54,14 +55,26 @@ Head getHead(){
 Block getFirst(){return getHead()->first;}
 Block getLast(){return getHead()->last;}
 Block getFirstFree(){return getHead()->firstFree;}
+Block getLastFree(){return getHead()->lastFree;}
+
+void setFirstFree(Block b);
+void setLastFree(Block b);
+void setLast(Block b);
+void setFirst(Block b);
 
 void setFirstFree(Block b)
 {
     if(!b){
         getHead()->firstFree = NULL;
+        setLastFree(NULL);
     }
     else{
-        b->free = getHead()->firstFree;
+        Block current = getFirstFree();
+
+        if(!current)
+            setLastFree(b);
+
+        b->free = getFirstFree();
         getHead()->firstFree = b;
     }
     
@@ -70,7 +83,11 @@ void setFirstFree(Block b)
 
 void removeFirstFree(){
 
-    Block first = getHead()->firstFree;
+    Block first = getFirstFree();
+
+    if(first->free == NULL)
+        setLastFree(NULL);
+
     getHead()->firstFree = first->free;
     first->free = NULL;
 
@@ -83,22 +100,28 @@ void setLast(Block b)
     getHead()->last = b;
 }
 
+void setLastFree(Block b){
+
+    getHead()->lastFree = b;
+    return;
+}
+
 //TMP fonctions pour imprimer
 void printBlock(Block b){
 
-    //printf("\nBlock :%i\n", b);
+    printf("\nBlock :%i\n", b);
 
-    //printf("\n   size :%i\n", b->size);
-    //printf("   free :%i\n", b->free);
-    //printf("   next :%i\n", b->next);
-    //printf("   prev :%i\n\n", b->prev);
+    printf("\n   size :%i\n", b->size);
+    printf("   free :%i\n", b->free);
+    printf("   next :%i\n", b->next);
+    printf("   prev :%i\n\n", b->prev);
 
     return;
 }
 
 void printList(){
 
-    //printf("|||***--- Liste de Blocks ---***|||\n");
+    printf("|||***--- Liste de Blocks ---***|||\n");
 
     Block current = getFirst();
 
@@ -109,14 +132,14 @@ void printList(){
         current = current->next;
     }
 
-    //printf("NULL...\n\n");
+    printf("NULL...\n\n");
 
     return;
 }
 
 void printFree(){
 
-    //printf("|||***--- Liste de Free Blocks ---***|||\n");
+    printf("|||***--- Liste de Free Blocks ---***|||\n");
 
     Block current = getFirstFree();
 
@@ -127,16 +150,26 @@ void printFree(){
         current = current->free;
     }
 
-    //printf("NULL...\n\n");
+    printf("NULL...\n\n");
 
     return;
 }
 
 void printLast(){
 
-    //printf("|||***--- Last ---***|||\n");
+    printf("|||***--- Last ---***|||\n");
 
     printBlock(getLast());
+
+    return;
+}
+
+void printLastFree(){
+
+    printf("|||***--- Last Free ---***|||\n");
+
+    if(getLastFree())
+        printBlock(getLastFree());
 
     return;
 }
@@ -171,8 +204,6 @@ Block findSpace(size_t size){
 
     //printf("On cherche ou inserer le prochain block...\n");
 
-    printFree();
-
     //On vérifie s'il y a de l'espace dans les blocks libérés
     Block current = getFirstFree();
     Block previous = NULL;
@@ -194,8 +225,6 @@ Block findSpace(size_t size){
 
             printBlock(current);
 
-            printFree();
-
             return current;
         }
         else{
@@ -205,7 +234,10 @@ Block findSpace(size_t size){
     }
 
     //Aucun espace libre, on va ajouter à la fin
-    //printf("Pas de block libre on ajoute a la fin\n");
+    
+
+
+    
     return getLast();
 }
 
@@ -236,6 +268,8 @@ void splitBlock(Block b, size_t size){
 
 
 void newPage(Block b, size_t sizePage, size_t sizeBlock){
+
+    //printf("Nouvelle Page!!\n");
 
     //On cree un nouveau block au début de la nouvelle page
     Block newBlock = malloc(sizePage);
@@ -335,11 +369,15 @@ void *mymalloc(size_t size){
         else {
 
             //printf("Nouvelle Page : %i\n", PAGE);
-
             newPage(blockInsert, PAGE, size);
         }
 
         Block newBlock = blockInsert->next;
+
+        printBlock(blockInsert);
+        printBlock(newBlock);
+
+        setLast(newBlock);
 
         addr = (void*)(newBlock+1);
 
@@ -356,6 +394,7 @@ void *mymalloc(size_t size){
         }
 
         //printf("ADRESSE DE RETOUR DU MALLOC : %i\n", blockInsert+1);
+        printBlock(blockInsert);
 
         return blockInsert+1;
     }
@@ -373,31 +412,38 @@ void myfree(void *ptr){
         return;
     }
 
+    ptr -= BLOCK_SIZE;
+
     Block current = getFirst();
 
     //printf("ptr : %i\n", ptr);
     //printf("current : %i\n", current+1);
 
-    while(current+1 != ptr){
+    while(current != ptr){
+
+        //printf("%i\n", ptr);
+        //printf("%i\n", current+1);
 
         current = current->next;
 
         //printf("current : %i\n", current+1);
-        if(!current){
+        if(current == NULL){
             //printf("Pointeur pas allouer avec mymalloc...\n");
             return;
         }
+
+        //printBlock(current);
     }
 
-    Block prevFree = findFreePrev(current);
+    if(current->free != NULL || current == getLastFree()){
+        printf("Deja libere...\n");
 
-/*    if(prevFree){
-        //Déjà libéré
+
         return;
-    }*/
-
+    }
 
     //printf("On libere : %i\n", current);
+    //printf("SET FREE : \n");
 
     setFirstFree(current);
 

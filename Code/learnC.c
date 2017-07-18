@@ -48,25 +48,84 @@ int main()
 
     printList();
     printFree();*/
-
+/*	int *a = mymalloc(sizeof(int) * 128);
 
 	for (int i = 0; i < 10; i++){
 		printf("boucle1 : %i\n", i);
 
-		int *a = mymalloc(sizeof(int) * 1024 * 1024);
+		a = mymalloc(sizeof(int) * 128);
 		//int *a = mymalloc(sizeof(int) * 32);
 		printf("adresse = %i\n", a);
 
-/*    	for(int j = 0; j < 1024 * 1024; j += 1000){
+	   	for(int j = 0; j < 1024 * 1024; j += 1000){
     	//for(int j = 0; j < 32; j ++){
     		a[j]= j;
-    	}*/
-    	myfree(a);
+    	}
+    	//myfree(a);
 	}
 
-	printList();
-	printFree();
+	myfree(a);
 
+	printList();
+	printFree();*/
+
+
+
+typedef struct node node;
+struct node {
+  int valueInt;
+  char valueChar;
+  node *next;
+  node *previous;
+};
+
+// Petit programme pour testé si malloc et free fonctionne bien
+  // La racine
+  node *root = mymalloc(sizeof(node));
+  root->valueInt = 0;
+  root->valueChar = 115;
+  root->next = NULL;
+  root->previous = NULL;
+
+  printf("Et de 1...\n");
+  // Création d'une liste doublement chaînée
+  node *current = root;
+  for(int i = 0; i < 20; i ++){
+    node *p = mymalloc(sizeof(node)*128);
+    p->valueInt = i;
+    p->valueChar = 115;
+    p->next = NULL;
+    p->previous = current;
+    current->next = p;
+    current = p;
+  }
+
+  printList();
+  printFree();
+  printLast();
+  printLastFree();
+
+  printf("Et de 2...\n");
+/*  // On efface quelques éléments
+  current = root;
+  int n = 0;
+  while (current->next){
+    n++;
+    if (n % 4 != 0) {
+      // Rien à faire
+      current = current->next;
+    }
+    else {
+      // On efface ce noeud
+      node *tmp;
+      current->previous->next = current->next;
+      current->next->previous = current->previous;
+      tmp = current->next;
+      myfree(current);
+      current = tmp;
+    }
+}*/
+ 
 
 
     return(0);
