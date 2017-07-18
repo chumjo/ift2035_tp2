@@ -58,7 +58,7 @@ Block getFirstFree(){return getHead()->firstFree;}
 void setFirstFree(Block b)
 {
     if(!b){
-        getHead()->firstFree = b;
+        getHead()->firstFree = NULL;
     }
     else{
         b->free = getHead()->firstFree;
@@ -67,6 +67,16 @@ void setFirstFree(Block b)
     
     return;
 }
+
+void removeFirstFree(){
+
+    Block first = getHead()->firstFree;
+    getHead()->firstFree = first->free;
+    first->free = NULL;
+
+    return;
+}
+
 void setLast(Block b)
 {
     getLast()->next = b;
@@ -161,6 +171,8 @@ Block findSpace(size_t size){
 
     //printf("On cherche ou inserer le prochain block...\n");
 
+    printFree();
+
     //On vérifie s'il y a de l'espace dans les blocks libérés
     Block current = getFirstFree();
     Block previous = NULL;
@@ -171,14 +183,18 @@ Block findSpace(size_t size){
 
             //printf("Ce block fera l'affaire!\n");
 
-            if(previous == NULL){
-                setFirstFree(current->free);
+            if(!previous){
+                //printf("C'est le premier free!!\n");
+                removeFirstFree(current->free);
             }
             else{
                 previous->free = current->free;
+                current->free = NULL;
             }
 
             printBlock(current);
+
+            printFree();
 
             return current;
         }
@@ -303,7 +319,8 @@ void *mymalloc(size_t size){
     Block blockInsert = findSpace(size);
 
     //Si on a besoin d'une nouvelle page mémoire
-    if(size + BLOCK_SIZE > (blockInsert->size) && blockInsert->next == NULL){
+    //if(size + BLOCK_SIZE > (blockInsert->size) && blockInsert->next == NULL){
+    if(size > (blockInsert->size) && blockInsert->next == NULL){
 
         //printf("Oups! Il manque d'espace, on en demande une nouvelle page...\n");
 
@@ -374,10 +391,10 @@ void myfree(void *ptr){
 
     Block prevFree = findFreePrev(current);
 
-    if(prevFree){
+/*    if(prevFree){
         //Déjà libéré
         return;
-    }
+    }*/
 
 
     //printf("On libere : %i\n", current);

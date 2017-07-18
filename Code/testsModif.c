@@ -91,6 +91,7 @@ int test6(){
   current = root;
   int n = 0;
   while (current->next){
+    printf("%i\n", n);
     n++;
     if (n % 23 != 0) {
       // Rien à faire
@@ -210,7 +211,7 @@ int main(){
 
   TEST_NOSEGFAULT(test4(), 4);
 
-  //TEST_NOSEGFAULT(test5(), 5);
+  TEST_NOSEGFAULT(test5(), 5);
 
   long res = 0;
   TEST_NOSEGFAULT(res=test6(), 6);
