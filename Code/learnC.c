@@ -1,35 +1,76 @@
 #include <stdio.h>
 #include <stdlib.h>
-//#include "mymalloc.h"
+#include "mymalloc.h"
 
 
 int main()
 {
 
-	if(!NULL)
-		printf("!NULL\n");
-
-	if(1)
-		printf("1\n");
-
-	if(0)
-		printf("0\n");
 /*	int *a = mymalloc(sizeof(int));
 	int *b = mymalloc(sizeof(int));
 	int *c = mymalloc(sizeof(int));
-	int *d = mymalloc(sizeof(int));
 
-	myfree(a);
 	myfree(b);
 
-	typedef struct block
-    {
-        size_t size;
-        struct block *free;
-        struct block *next, *pred;
-    } *Block;
+	printList();
+    printLast();
+    printFree();
+    printLastFree();
 
-    printf("Size of struct :%i\n", sizeof(struct block));*/
+    printf("--------------------------------------------------------------------------\n");
+
+	b = mymalloc(sizeof(int));
+
+	printList();
+    printLast();
+    printFree();
+    printLastFree();*/
+
+/*    int *a = mymalloc(sizeof(int) * 1024 * 1024);
+    int *b = mymalloc(sizeof(int) * 1024 * 1024);
+    int *c = mymalloc(sizeof(int) * 1024 * 1024);
+    int *d = mymalloc(sizeof(int) * 1024 * 1024);
+    int *e = mymalloc(sizeof(int) * 1024 * 1024);
+
+    printList();
+    printFree();
+
+    myfree(a);
+    myfree(b);
+    myfree(c);
+    myfree(d);
+
+    printList();
+    printFree();
+
+    a = mymalloc(sizeof(int) * 1024 * 1024);
+    b = mymalloc(sizeof(int) * 1024 * 1024);
+    c = mymalloc(sizeof(int) * 1024 * 1024);
+    d = mymalloc(sizeof(int) * 1024 * 1024);
+
+    printList();
+    printFree();
+*/
+
+	for (int i = 0; i < 10; i++){
+		printf("boucle1 : %i\n", i);
+
+		int *a = mymalloc(sizeof(int) * 1024 * 1024);
+		//int *a = mymalloc(sizeof(int) * 32);
+
+		printf("adresse = %i\n", a);
+    	for(int j = 0; j < 1024 * 1024; j += 1000){
+    	//for(int j = 0; j < 32; j ++){
+    		a[j]= j;
+    	}
+    	myfree(a);
+	}
+
+	printList();
+	printFree();
+	printLastFree();
+
+
 
     return(0);
 }
