@@ -74,7 +74,7 @@ void setFirstFree(Block b)
         if(!current)
             setLastFree(b);
 
-        b->free = getFirstFree();
+        b->free = current;
         getHead()->firstFree = b;
     }
     
@@ -86,7 +86,7 @@ void removeFirstFree(){
     Block first = getFirstFree();
 
     if(first->free == NULL)
-        setLastFree(NULL);
+    	setLastFree(NULL);
 
     getHead()->firstFree = first->free;
     first->free = NULL;
@@ -241,9 +241,9 @@ Block findSpace(size_t size){
 
             //printf("Ce block fera l'affaire!\n");
 
-            if(!previous){
+            if(previous == NULL){
                 //printf("C'est le premier free!!\n");
-                removeFirstFree(current->free);
+                removeFirstFree();
             }
             else{
                 previous->free = current->free;
@@ -269,7 +269,6 @@ Block findSpace(size_t size){
 void splitBlock(Block b, size_t size){
 
     //printf("Reste : %i\n", b->size);
-
     Block newBlock = ((void*) (b+1)) + size;
 
     newBlock->size = b->size - size - BLOCK_SIZE;
@@ -281,7 +280,7 @@ void splitBlock(Block b, size_t size){
     b->size = size;
 
     //if(newBlock->next != NULL)
-        setFirstFree(newBlock);
+    setFirstFree(newBlock);
 
     if(newBlock->next == NULL){
         //printf("On vient de splitter le dernier block\n");
@@ -353,7 +352,7 @@ void *mymalloc(size_t size){
     Block blockInsert = findSpace(size);
 
     //printBlock(blockInsert);
-    if(blockInsert->size != size){
+    if(blockInsert->size > size){
         //printf("ON SPLIT!!!\n");
         splitBlock(blockInsert, size);
     }
@@ -374,7 +373,9 @@ void myfree(void *ptr){
 
     ptr -= BLOCK_SIZE;
 
-    Block current = getFirst();
+    //Block current = ptr;
+
+	Block current = getFirst();
 
     while(current != ptr){
 
@@ -389,7 +390,7 @@ void myfree(void *ptr){
     //printBlock(current);
 
     if(current->free != NULL || current == getLastFree()){
-        printf("Deja libere...\n");
+        //printf("Deja libere...\n");
 
         return;
     }

@@ -19,16 +19,29 @@ void test1(){
 // Utilisation très simple de malloc et free
 void test2(){
   int *a = mymalloc(sizeof(int));
-
   *a = 0;
   myfree(a);
+  printf("COOL!!\n");
 }
 
 // Test simple pour voir si free fonctionne
 // Chaque demande entre dans un bloc mémoire de 4 Ko
 void test3(){
-  for (int i = 0; i < 500000; i++){
+
+/*  printList();
+  printLast();
+  printFree();
+  printLastFree();*/
+
+  for (int i = 0; i < 1; i++){
     int *a = mymalloc(sizeof(int) * 512);
+
+/*  printList();
+  printLast();
+  printFree();
+  printLastFree();*/
+
+
     for(int j = 0; j < 512; j ++){
       a[j]= j;
     }
@@ -77,7 +90,7 @@ int test6(){
   printf("Et de 1...\n");
   // Création d'une liste doublement chaînée
   node *current = root;
-  for(int i = 0; i < 4 * 1024 * 4; i ++){
+  for(int i = 0; i < 4 * 1024 * 1024; i ++){
     node *p = mymalloc(sizeof(node));
     p->valueInt = i;
     p->valueChar = 115;
@@ -204,7 +217,7 @@ void sigseg_handler(int signum) {
 
 int main(){
   signal(SIGSEGV, &sigseg_handler);
-  TEST_NOSEGFAULT(test1(), 1);
+/*  TEST_NOSEGFAULT(test1(), 1);
 
   TEST_NOSEGFAULT(test2(), 2);
 
@@ -213,7 +226,7 @@ int main(){
   TEST_NOSEGFAULT(test4(), 4);
 
   TEST_NOSEGFAULT(test5(), 5);
-
+*/
   long res = 0;
   TEST_NOSEGFAULT(res=test6(), 6);
   if (res == 632474318)
