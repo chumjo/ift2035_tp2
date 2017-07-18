@@ -15,6 +15,5 @@ void myfree(void *ptr);
 void printList();
 void printLast();
 void printFree();
-void printLastFree();
 
 #endif // MYMALLOC_H_

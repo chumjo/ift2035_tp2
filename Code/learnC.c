@@ -6,7 +6,7 @@
 int main()
 {
 
-/*	int *a = mymalloc(sizeof(int));
+	int *a = mymalloc(sizeof(int));
 	int *b = mymalloc(sizeof(int));
 	int *c = mymalloc(sizeof(int));
 
@@ -15,7 +15,6 @@ int main()
 	printList();
     printLast();
     printFree();
-    printLastFree();
 
     printf("--------------------------------------------------------------------------\n");
 
@@ -24,7 +23,6 @@ int main()
 	printList();
     printLast();
     printFree();
-    printLastFree();*/
 
 /*    int *a = mymalloc(sizeof(int) * 1024 * 1024);
     int *b = mymalloc(sizeof(int) * 1024 * 1024);
@@ -52,13 +50,13 @@ int main()
     printFree();
 */
 
-	for (int i = 0; i < 10; i++){
+/*	for (int i = 0; i < 10; i++){
 		printf("boucle1 : %i\n", i);
 
 		int *a = mymalloc(sizeof(int) * 1024 * 1024);
 		//int *a = mymalloc(sizeof(int) * 32);
-
 		printf("adresse = %i\n", a);
+
     	for(int j = 0; j < 1024 * 1024; j += 1000){
     	//for(int j = 0; j < 32; j ++){
     		a[j]= j;
@@ -67,8 +65,7 @@ int main()
 	}
 
 	printList();
-	printFree();
-	printLastFree();
+	printFree();*/
 
 
 

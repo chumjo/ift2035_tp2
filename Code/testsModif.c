@@ -202,13 +202,13 @@ void sigseg_handler(int signum) {
 
 int main(){
   signal(SIGSEGV, &sigseg_handler);
-  //TEST_NOSEGFAULT(test1(), 1);
+  TEST_NOSEGFAULT(test1(), 1);
 
-  //TEST_NOSEGFAULT(test2(), 2);
+  TEST_NOSEGFAULT(test2(), 2);
 
-  //TEST_NOSEGFAULT(test3(), 3);
+  TEST_NOSEGFAULT(test3(), 3);
 
-  //TEST_NOSEGFAULT(test4(), 4);
+  TEST_NOSEGFAULT(test4(), 4);
 
   //TEST_NOSEGFAULT(test5(), 5);
 

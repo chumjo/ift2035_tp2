@@ -14,7 +14,7 @@
 
 typedef struct head
 {
-    struct block *first, *last, *firstFree, *lastFree;
+    struct block *first, *last, *firstFree;
 } *Head;
 
 
@@ -46,7 +46,6 @@ Head getHead(){
         head->first = firstBlock;
         head->last = firstBlock;
         head->firstFree = firstBlock;
-        head->lastFree = firstBlock;
     }
 
     return head;
@@ -55,11 +54,18 @@ Head getHead(){
 Block getFirst(){return getHead()->first;}
 Block getLast(){return getHead()->last;}
 Block getFirstFree(){return getHead()->firstFree;}
-Block getLastFree(){return getHead()->lastFree;}
 
 void setFirstFree(Block b)
 {
-    getHead()->firstFree = b;
+    if(!b){
+        getHead()->firstFree = b;
+    }
+    else{
+        b->free = getHead()->firstFree;
+        getHead()->firstFree = b;
+    }
+    
+    return;
 }
 void setLast(Block b)
 {
@@ -67,36 +73,22 @@ void setLast(Block b)
     getHead()->last = b;
 }
 
-void setLastFree(Block b)
-{
-    if(getLastFree() == NULL){
-        //printf("Set First et Last Free!\n");
-        setFirstFree(b);
-        getHead()->lastFree = b;
-    }
-    else{
-        getLastFree()->free = b;
-        getHead()->lastFree = b;
-    }
-}
-
-
 //TMP fonctions pour imprimer
 void printBlock(Block b){
 
-    printf("\nBlock :%i\n", b);
+    //printf("\nBlock :%i\n", b);
 
-    printf("\n   size :%i\n", b->size);
-    printf("   free :%i\n", b->free);
-    printf("   next :%i\n", b->next);
-    printf("   prev :%i\n\n", b->prev);
+    //printf("\n   size :%i\n", b->size);
+    //printf("   free :%i\n", b->free);
+    //printf("   next :%i\n", b->next);
+    //printf("   prev :%i\n\n", b->prev);
 
     return;
 }
 
 void printList(){
 
-    printf("|||***--- Liste de Blocks ---***|||\n");
+    //printf("|||***--- Liste de Blocks ---***|||\n");
 
     Block current = getFirst();
 
@@ -107,14 +99,14 @@ void printList(){
         current = current->next;
     }
 
-    printf("NULL...\n\n");
+    //printf("NULL...\n\n");
 
     return;
 }
 
 void printFree(){
 
-    printf("|||***--- Liste de Free Blocks ---***|||\n");
+    //printf("|||***--- Liste de Free Blocks ---***|||\n");
 
     Block current = getFirstFree();
 
@@ -125,34 +117,19 @@ void printFree(){
         current = current->free;
     }
 
-    printf("NULL...\n\n");
+    //printf("NULL...\n\n");
 
     return;
 }
 
 void printLast(){
 
-    printf("|||***--- Last ---***|||\n");
+    //printf("|||***--- Last ---***|||\n");
 
     printBlock(getLast());
 
     return;
 }
-
-void printLastFree(){
-
-    printf("|||***--- Last Free ---***|||\n");
-
-    Block lastFree = getLastFree();
-
-    if(lastFree)
-        printBlock(lastFree);
-    else
-        printf("NULL...\n");
-
-    return;
-}
-
 
 
 int aligne32(size_t size){
@@ -192,17 +169,16 @@ Block findSpace(size_t size){
 
         if(current->size >= size){
 
-            if(previous == NULL){
-                
-                if(getLastFree() == current)
-                    setLastFree(NULL);
+            //printf("Ce block fera l'affaire!\n");
 
+            if(previous == NULL){
                 setFirstFree(current->free);
             }
             else{
                 previous->free = current->free;
             }
 
+            printBlock(current);
 
             return current;
         }
@@ -232,7 +208,7 @@ void splitBlock(Block b, size_t size){
     b->size = size;
 
     if(newBlock->next != NULL)
-        setLastFree(newBlock);
+        setFirstFree(newBlock);
 
     if(newBlock->next == NULL){
         //printf("On vient de splitter le dernier block\n");
@@ -270,11 +246,7 @@ void mergeNextBlock(Block b){
     //printf("MergeNextBlock!\n");
     Block next = b->next;
 
-    if(next->free == NULL && getLastFree() != next)
-        return;
-
     Block prevFree = findFreePrev(next);
-
 
     if(prevFree && b->size + (void*) (b+1) == next){
 
@@ -297,11 +269,7 @@ void mergePreviousBlock(Block b){
     //printf("MergeNextBlock!\n");
     Block previous = b->prev;
 
-    if(previous->free == NULL && getLastFree() != previous)
-        return;
-
     Block prevFree = findFreePrev(previous);
-
 
     if(prevFree && previous->size + (void*) (b+1) == b){
 
@@ -404,15 +372,17 @@ void myfree(void *ptr){
         }
     }
 
-    if(current->free != NULL || current == getLastFree()){
-        //Espace memoire déjà libéré...
+    Block prevFree = findFreePrev(current);
+
+    if(prevFree){
+        //Déjà libéré
         return;
     }
 
-    printf("On libere : %i\n", current);
 
-    current->free = NULL;
-    setLastFree(current);
+    //printf("On libere : %i\n", current);
+
+    setFirstFree(current);
 
 /*    if(current->next != NULL){
         mergeNextBlock(current);
