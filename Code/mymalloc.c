@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <sys/mman.h>
+#include <sys/mman.h>
 
 //Macros
 #define BLOCK_SIZE (64)
@@ -42,10 +42,12 @@ Head getHead(){
     if(head == NULL){
 
         //Alloue un peu de mémoire pour le head
-        head = malloc(sizeof(struct head));
+        //head = malloc(sizeof(struct head));
+        head = mmap(NULL, sizeof(struct head), PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
         //Crée un nouveau block vide
-        Block firstBlock = malloc(PAGE);
+        //Block firstBlock = malloc(PAGE);
+        Block firstBlock = mmap(NULL, PAGE, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
         firstBlock->size = PAGE - BLOCK_SIZE;   //Size du block
         firstBlock->free = NULL;                //Prochain Block libre (si ce block fait partie de la liste de block libre)
@@ -149,6 +151,15 @@ int alignBlock(size_t size){
         return size;
 }
 
+int alignPage(size_t size){
+
+    int rest = size % PAGE;
+    if(rest != 0)
+        return size - rest + PAGE;
+    else
+        return size;
+}
+
 //Fonction qui crée une nouvelle page mémoire au besoin
 Block newPage(size_t size){
 
@@ -159,13 +170,14 @@ Block newPage(size_t size){
     //Si on veut une page plus grande que la taille normale
     if(size > PAGE-BLOCK_SIZE){
 
+        size = alignPage(size);
         sizePage = size+BLOCK_SIZE;
     }
     else
         sizePage = PAGE;
 
-
-    Block newBlock = malloc(sizePage);
+    //Block newBlock = malloc(sizePage);
+    Block newBlock = mmap(NULL, sizePage, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
     newBlock->size = sizePage - BLOCK_SIZE;
     newBlock->pageSize = newBlock->size;
