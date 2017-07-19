@@ -1,6 +1,3 @@
-//Jonathan Larose
-//Lisanne Duquette
-
 // Vous devez modifier ce fichier pour le TP 2
 // Tous votre code doit être dans ce fichier
 
@@ -41,31 +38,31 @@ Head getHead(){
 
     if(head == NULL){
 
-        //Alloue un peu de mémoire pour le head
         head = malloc(sizeof(struct head));
+        //memoryList = mmap(NULL, PAGE, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
-        //Crée un nouveau block vide
+        //On cree un nouveau block au début de la nouvelle page
         Block firstBlock = malloc(PAGE);
 
-        firstBlock->size = PAGE - BLOCK_SIZE;   //Size du block
-        firstBlock->free = NULL;                //Prochain Block libre (si ce block fait partie de la liste de block libre)
-        firstBlock->next = NULL;                //prochain block
-        firstBlock->prev = NULL;                //block pécédent
-        firstBlock->nextPage = NULL;            //Prochaine page mémoire (si ce block est le premier d'une page mémoire)
+        firstBlock->size = PAGE - BLOCK_SIZE;
+        firstBlock->free = NULL;
+        firstBlock->next = NULL;
+        firstBlock->prev = NULL;
+        firstBlock->nextPage = NULL;
 
-        //Pointe les éléments du Header vers le nouveau block
-        head->first = firstBlock;       //Premier Block de la liste de tout les blocks
-        head->last = firstBlock;        //Dernier Block de la liste de tout les blocks
-        head->firstFree = firstBlock;   //Premier Block de la liste de blocks libres
-        head->lastFree = firstBlock;    //Dernier Block de la liste de blocks libres
-        head->firstPage = firstBlock;   //Premier Block de la liste de page mémoire
-        head->lastPage = firstBlock;    //Dernier Block de la liste de page mémoire
+        head->first = firstBlock;
+        head->last = firstBlock;
+        head->firstFree = firstBlock;
+        head->lastFree = firstBlock;
+        head->firstPage = firstBlock;
+        head->lastPage = firstBlock;
+
+        //printBlock(firstBlock);
     }
 
     return head;
 }
 
-//Getters pour les éléments du Head
 Block getFirst(){return getHead()->first;}
 Block getLast(){return getHead()->last;}
 Block getFirstFree(){return getHead()->firstFree;}
@@ -77,20 +74,16 @@ void setFirstFree(Block b);
 void setLastFree(Block b);
 void setLast(Block b);
 void setFirst(Block b);
-void printBlock(Block b);
 
-//Fonction qui ajoute un block libre au début de la liste de block libre
 void setFirstFree(Block b)
 {
     if(!b){
-        //Si ont met le premier élément à NULL, on met le dernier free à NULL aussi
         getHead()->firstFree = NULL;
         setLastFree(NULL);
     }
     else{
         Block current = getFirstFree();
 
-        //Si le premier élément de la liste de Block libre est null, le nouveau premier block est aussi le dernier
         if(!current)
             setLastFree(b);
 
@@ -101,7 +94,6 @@ void setFirstFree(Block b)
     return;
 }
 
-//Fonction qui enlève le premier élément de la liste de blocks libres
 void removeFirstFree(){
 
     Block first = getFirstFree();
@@ -115,22 +107,18 @@ void removeFirstFree(){
     return;
 }
 
-//Fonction qui ajoute un block à la liste fin de la liste de block
 void setLast(Block b)
 {
     getLast()->next = b;
     getHead()->last = b;
-    return;
 }
 
-//Fonction qui set le block comme étant le dernier block libre
 void setLastFree(Block b){
 
     getHead()->lastFree = b;
     return;
 }
 
-//Ajoute une page à la liste de page
 void setLastPage(Block b){
 
 	getLastPage()->nextPage = b;
@@ -139,7 +127,75 @@ void setLastPage(Block b){
 	return;
 }
 
-//Fonction qui aligne la taille d'un espace demandé sur un multiple de nos blocks
+//TMP fonctions pour imprimer
+void printBlock(Block b){
+
+    printf("\nBlock :%i\n", b);
+
+    printf("\n   size :%i\n", b->size);
+    printf("   free :%i\n", b->free);
+    printf("   next :%i\n", b->next);
+    printf("   prev :%i\n\n", b->prev);
+
+    return;
+}
+
+void printList(){
+
+    printf("|||***--- Liste de Blocks ---***|||\n");
+
+    Block current = getFirst();
+
+    while(current){
+
+        printBlock(current);
+
+        current = current->next;
+    }
+
+    printf("NULL...\n\n");
+
+    return;
+}
+
+void printFree(){
+
+    printf("|||***--- Liste de Free Blocks ---***|||\n");
+
+    Block current = getFirstFree();
+
+    while(current){
+
+        printBlock(current);
+
+        current = current->free;
+    }
+
+    printf("NULL...\n\n");
+
+    return;
+}
+
+void printLast(){
+
+    printf("|||***--- Last ---***|||\n");
+
+    printBlock(getLast());
+
+    return;
+}
+
+void printLastFree(){
+
+    printf("|||***--- Last Free ---***|||\n");
+
+    if(getLastFree())
+        printBlock(getLastFree());
+
+    return;
+}
+
+
 int alignBlock(size_t size){
 
     int rest = size % BLOCK_SIZE;
@@ -149,16 +205,31 @@ int alignBlock(size_t size){
         return size;
 }
 
-//Fonction qui crée une nouvelle page mémoire au besoin
+
+Block findFreePrev(Block b){
+
+    Block current = getFirstFree();
+
+    while(current != NULL){
+
+        if(current->free == b)
+            return current;
+
+        current = current->free;
+    }
+
+    return NULL;
+}
+
 Block newPage(size_t size){
 
+    //printf("Nouvelle Page!!\n");
 
     //On cree un nouveau block au début de la nouvelle page
     int sizePage;
 
-    //Si on veut une page plus grande que la taille normale
     if(size > PAGE-BLOCK_SIZE){
-
+        //TODO align4096
         sizePage = size+BLOCK_SIZE;
     }
     else
@@ -175,27 +246,29 @@ Block newPage(size_t size){
     newBlock->prev = getLast();
     newBlock->nextPage = NULL;
 
-    //C'est le dernier BLock et la dernière page
     setLast(newBlock);
     setLastPage(newBlock);
 
     return newBlock;
 }
 
-//Fonction qui retourne un block libre d'au moins la taille demandé
 Block findSpace(size_t size){
 
+	//printList();
+
+    //printf("On cherche ou inserer le prochain block...\n");
     //On vérifie s'il y a de l'espace dans les blocks libérés
     Block current = getFirstFree();
     Block previous = NULL;
 
     while(current != NULL){
 
-        //Si on trouve un block
         if(current->size >= size){
 
-            //On le retire le block de la liste de block libre
+            //printf("Ce block fera l'affaire!\n");
+
             if(previous == NULL){
+                //printf("C'est le premier free!!\n");
                 removeFirstFree();
             }
             else{
@@ -203,23 +276,22 @@ Block findSpace(size_t size){
                 current->free = NULL;
             }
 
-            //On le retourne
+            //printBlock(current);
+
             return current;
         }
-        //Sinon, on regarde le prochain block libre
         else{
             previous = current;
             current = current->free;
         }
     }
 
-    //Aucun espace libre disponible, on crée une nouvelle page mémoire
+    //Aucun espace libre, on va ajouter à la fin
     Block newBlock = newPage(size);
 
     return newBlock;
 }
 
-//Fonction qui traverse les pages mémoire et retourne la page mémoire dans laquelle se trouve le pointeur (NULL sinon)
 Block findPage(void *ptr){
 
 	Block current = getFirstPage();
@@ -227,11 +299,12 @@ Block findPage(void *ptr){
 	while(current != NULL){
 
 		int page = current->pageSize / BLOCK_SIZE;
+
 		void* deb = (void*) current;
 		void* fin = (void*) (current + page);
 
 		if(deb <= ptr && ptr < fin){
-
+			//printf("TROUVER!!!\n");
 			return current;
 		}
 		else
@@ -241,9 +314,9 @@ Block findPage(void *ptr){
 	return NULL;
 }
 
-//Fonction qui split un block trop grand par la taille voulu
 void splitBlock(Block b, size_t size){
 
+    //printf("Reste : %i\n", b->size);
     Block newBlock = ((void*) (b+1)) + size;
 
     newBlock->size = b->size - size - BLOCK_SIZE;
@@ -254,74 +327,149 @@ void splitBlock(Block b, size_t size){
 
     b->size = size;
 
-    //Le nouveau block est libre
+    //if(newBlock->next != NULL)
     setFirstFree(newBlock);
 
-    //Si le nouveau block est le dernier
     if(newBlock->next == NULL){
-
+        //printf("On vient de splitter le dernier block\n");
         setLast(newBlock);
     }
 
     return;
 }
 
+
+//Fonction qui merge le block courant et le suivant si c'est possible
+void mergeNextBlock(Block b){
+
+    //printf("MergeNextBlock!\n");
+    Block next = b->next;
+
+    Block prevFree = findFreePrev(next);
+
+    if(prevFree && b->size + (void*) (b+1) == next){
+
+        b->size = b->size + (next->size) + BLOCK_SIZE;
+        b->next = next->next;
+
+        if(b->next != NULL)
+            b->next->prev = b;
+
+        prevFree->free = next->free;
+
+    }
+    
+    return;
+}
+
+//Fonction qui merge le block courant et le précédent si c'est possible
+void mergePreviousBlock(Block b){
+
+    //printf("MergeNextBlock!\n");
+    Block previous = b->prev;
+
+    Block prevFree = findFreePrev(previous);
+
+    if(prevFree && previous->size + (void*) (b+1) == b){
+
+        previous->size = b->size + (previous->size) + BLOCK_SIZE;
+        previous->next = b->next;
+
+        if(b->next != NULL)
+            b->next->prev = previous;
+
+        prevFree->free = previous->free;
+
+        previous->free = NULL;
+
+    }
+    
+    return;
+}
+
+
 void *mymalloc(size_t size){
 
-    //On veut que la taille soit un multiple de nos block
+    //printf("\n|------------|\n|- Mymalloc -|\n|------------|\n");
+
     size = alignBlock(size);
+
+    //printf("On cherche un espace de taille : %i\n", size);
 
     //Trouver le bloc où on doit insérer
     Block blockInsert = findSpace(size);
 
-    //Si le block est trop gros, on le split
+    //printBlock(blockInsert);
     if(blockInsert->size > size){
-
+        //printf("ON SPLIT!!!\n");
         splitBlock(blockInsert, size);
     }
 
-    //On retourne l'adresse utilisable à l'utilisateur
+    //printf("ADRESSE DE RETOUR DU MALLOC : %i\n", blockInsert+1);
+    //printBlock(blockInsert);
+
     return blockInsert+1;
 }
 
 
 void myfree(void *ptr){
 
+	//printf("MYFREE\n");
+
     if(ptr == NULL){
         //printf("Pointeur NULL, aucune memoire n'est liberee...\n");
         return;
     }
 
+
+    //printf("ptr = %i \n", ptr);
     //On cherche si le pointeur est dans une de nos page
-    //Block current = findPage(ptr);
+    Block current = findPage(ptr);
 
-    Block current = getFirst();
 
-    //Si non, le pointeur n'a pas été retourné par mymalloc
     if(!current){
-    	//printf("Pointeur pas allouer par mymalloc\n");
+    	//Pas alloué par mymalloc
+    	//printf("pas trouver...\n");
     	return;
     }
 
-    //Cherche le pointeur dans la page
     while(current+1 != ptr){
 
     	current = current->next;
 
-        //Si absent...
         if(current == NULL){
-            //printf("Pointeur pas allouer par mymalloc\n");
+            //printf("Pointeur pas allouer avec mymalloc...\n");
             return;
         }
     }
 
-    //Si le pointeur est déjà libre...
+    //printBlock(current);
+
     if(current->free != NULL || current == getLastFree()){
-        //printf("Deja liberee...\n");
+        //printf("Deja libere...\n");
+
         return;
     }
 
+    //printf("On libere : %i\n", current);
+    //printf("SET FREE : \n");
+
     setFirstFree(current);
+
+/*    if(current->next != NULL){
+        mergeNextBlock(current);
+    }
+
+    if(current->prev != NULL){
+        mergePreviousBlock(current);
+    }*/
+
+    /*if(current->size >= PAGE + BLOCK_SIZE){
+        //munmap.....
+    }*/
     
     return;
 }
+
+//Voici l'appel de mmap pour allouer les pages.
+//mmap(NULL, nb_page * 4096, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);

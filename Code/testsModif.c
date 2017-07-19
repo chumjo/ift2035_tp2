@@ -21,27 +21,13 @@ void test2(){
   int *a = mymalloc(sizeof(int));
   *a = 0;
   myfree(a);
-  printf("COOL!!\n");
 }
 
 // Test simple pour voir si free fonctionne
 // Chaque demande entre dans un bloc mémoire de 4 Ko
 void test3(){
-
-/*  printList();
-  printLast();
-  printFree();
-  printLastFree();*/
-
-  for (int i = 0; i < 1; i++){
+  for (int i = 0; i < 500000; i++){
     int *a = mymalloc(sizeof(int) * 512);
-
-/*  printList();
-  printLast();
-  printFree();
-  printLastFree();*/
-
-
     for(int j = 0; j < 512; j ++){
       a[j]= j;
     }
@@ -78,8 +64,11 @@ struct node {
   node *previous;
 };
 
+
 // Petit programme pour testé si malloc et free fonctionne bien
 int test6(){
+
+  printf("Et de 0...\n");
   // La racine
   node *root = mymalloc(sizeof(node));
   root->valueInt = 0;
@@ -87,10 +76,10 @@ int test6(){
   root->next = NULL;
   root->previous = NULL;
 
-  printf("Et de 1...\n");
   // Création d'une liste doublement chaînée
   node *current = root;
   for(int i = 0; i < 4 * 1024 * 1024; i ++){
+    //printf("%i\n", i);
     node *p = mymalloc(sizeof(node));
     p->valueInt = i;
     p->valueChar = 115;
@@ -100,7 +89,8 @@ int test6(){
     current = p;
   }
 
-  printf("Et de 2...\n");
+  printf("Et de 1...\n");
+
   // On efface quelques éléments
   current = root;
   int n = 0;
@@ -112,7 +102,6 @@ int test6(){
     }
     else {
       // On efface ce noeud
-      //printf("%i\n", n);
       node *tmp;
       current->previous->next = current->next;
       current->next->previous = current->previous;
@@ -122,7 +111,7 @@ int test6(){
     }
   }
 
-  printf("Et de 3...\n");
+  printf("Et de 2...\n");
 
   // Quelques appel à malloc voir si cela vous mélange un peu
   void *ptrArray[1024];
@@ -132,7 +121,7 @@ int test6(){
     ptrArray[i] = d;
   }
 
-  printf("Et de 4...\n");
+  printf("Et de 3...\n");
 
   // On ajoute quelques éléments
   current = root;
@@ -156,7 +145,7 @@ int test6(){
     }
   }
 
-  printf("Et de 5...\n");
+  printf("Et de 4...\n");
 
   // Calcul de la somme
   current = root;
@@ -166,7 +155,7 @@ int test6(){
     current = current->next;
   }
 
-  printf("Et de 6...\n");
+  printf("Et de 5...\n");
 
   // Nettoyage de la mémoire
   current = root;
@@ -177,13 +166,11 @@ int test6(){
   }
   myfree(current);
 
-  printf("Et de 7...\n");
+  printf("Et de 6...\n");
 
   for(int i = 0; i < 1024; i ++){
     myfree(ptrArray[i]);
   }
-
-  printf("Et de 8...\n");
 
   return sum;
 }
@@ -225,8 +212,8 @@ int main(){
 
   TEST_NOSEGFAULT(test4(), 4);
 
-  TEST_NOSEGFAULT(test5(), 5);
-*/
+  TEST_NOSEGFAULT(test5(), 5);*/
+
   long res = 0;
   TEST_NOSEGFAULT(res=test6(), 6);
   if (res == 632474318)

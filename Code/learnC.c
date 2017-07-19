@@ -6,14 +6,16 @@
 int main()
 {
 
-  for (int i = 0; i < 500000; i++){
-    int *a = mymalloc(sizeof(int) * 512);
-    for(int j = 0; j < 512; j ++){
-      a[j]= j;
-    }
-    myfree(a);
-  }
+	int *a = mymalloc(sizeof(int)*256);
 
+	printList();
+	
+	int *b = mymalloc(sizeof(int)*256);
+	int *c = mymalloc(sizeof(int)*256);
+	int *d = mymalloc(sizeof(int)*256);
+	int *e = mymalloc(sizeof(int)*256);
+
+	printList();
 
     return(0);
 }
